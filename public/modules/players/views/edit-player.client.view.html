@@ -1,0 +1,32 @@
+<section data-ng-controller="PlayersUpdateController as playersUpCtrl">
+    <div class="modal-header">
+        <h3 class="modal-title">Edit Player</h3>
+    </div>
+    <div class="modal-body">
+    </div>
+
+
+
+    <form>
+        <fieldset>
+            <div class="row">
+                <div class="form-group">
+                    <label class="control-label" for="name">Name</label>
+                    <label class="control-label" for="rank">Rank</label>
+
+                    <div class="controls">
+                        <input type="text" data-ng-model="player.name" id="name" class="form-control" placeholder="Name" required>
+                        <input type="text" data-ng-model="player.rank" id="rank" class="form-control" placeholder="Rank" required>
+                    </div>
+                </div>
+                <div data-ng-show="error" class="text-danger">
+                    <strong data-ng-bind="error"></strong>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="console.log('test1'); playersUpCtrl.update(player); console.log('test2');  ok()">OK?</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+</section>

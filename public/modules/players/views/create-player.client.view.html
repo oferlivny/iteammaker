@@ -1,28 +1,32 @@
-<section data-ng-controller="PlayersController">
-    <div class="page-header">
-        <h1>New Player</h1>
+<section data-ng-controller="PlayersCreateController as playersCreateCtrl">
+    <div class="modal-header">
+        <h3 class="modal-title">Edit Player</h3>
     </div>
-    <div class="col-md-12">
-        <form class="form-horizontal" data-ng-submit="create()" novalidate>
-            <fieldset>
+    <div class="modal-body">
+    </div>
+
+
+
+    <form name="NewPlayerForm">
+        <fieldset>
+            <div class="row">
                 <div class="form-group">
                     <label class="control-label" for="name">Name</label>
-                    <div class="controls">
-                        <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
-                    </div>
                     <label class="control-label" for="rank">Rank</label>
-                     <div class="controls">
-                        <input type="text" data-ng-model="rank" id="rank" class="form-control" placeholder="Rank" required>
+
+                    <div class="controls">
+                        <input type="text" data-ng-model="playersCreateCtrl.player.name" id="name" class="form-control" placeholder="Name" required>
+                        <input type="text" max="10" min="0" data-ng-model="playersCreateCtrl.player.rank" id="rank" class="form-control" placeholder="Rank" required>
                     </div>
-                    
                 </div>
-                <div class="form-group">
-                    <input type="submit" class="btn btn-default">
+                <div data-ng-show="error" class="text-danger">
+                    <strong data-ng-bind="error"></strong>
                 </div>
-				<div data-ng-show="error" class="text-danger">
-					<strong data-ng-bind="error"></strong>
-				</div>
-            </fieldset>
-        </form>
+            </div>
+        </fieldset>
+    </form>
+    <div class="modal-footer">
+        <button ng-disabled="NewPlayerForm.$invalid" class="btn btn-primary" type="button" ng-click=" playersCreateCtrl.create(); ok()">OK</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
     </div>
 </section>

@@ -1,0 +1,27 @@
+<!--<div class="list-group">-->
+<div class="list-group-item" ng-repeat="player in playersCtrl.players">
+<!--    <div class="list-group-item">-->
+    <div class="row">
+        <div class="col-xs-2 ">
+            <button type="button" class="btn btn-danger btn-sm" ng-click="playersCtrl.deletePlayer(player);">
+                <i class="glyphicon glyphicon-trash"></i>
+                Delete
+            </button>
+        </div>
+        <div class="col-xs-4  col-xs-offset-1">
+            <div class="row-xs-6">
+                Name: {{player.name}}
+            </div>
+            <div class="row-xs-6">
+                Rank: {{player.rank}}
+            </div>
+        </div>
+        <div class="col-xs-2">
+            <button type="button" class="btn btn-default btn-sm" ng-click="playersCtrl.openModalView('lg',player);">
+                <i class="glyphicon glyphicon-pencil"></i>
+                Edit
+            </button>
+        </div>
+    </div>
+</div>
+<!--</div>-->

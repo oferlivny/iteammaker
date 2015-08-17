@@ -5,9 +5,7 @@
     <div class="modal-body">
     </div>
 
-
-
-    <form>
+    <form name="EditPlayerForm">
         <fieldset>
             <div class="row">
                 <div class="form-group">
@@ -16,7 +14,7 @@
 
                     <div class="controls">
                         <input type="text" data-ng-model="player.name" id="name" class="form-control" placeholder="Name" required>
-                        <input type="text" data-ng-model="player.rank" id="rank" class="form-control" placeholder="Rank" required>
+                        <input type="number" max="10" min="0" data-ng-model="player.rank" id="rank" class="form-control" placeholder="Rank" required>
                     </div>
                 </div>
                 <div data-ng-show="error" class="text-danger">
@@ -26,7 +24,7 @@
         </fieldset>
     </form>
     <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="console.log('test1'); playersUpCtrl.update(player); console.log('test2');  ok()">OK?</button>
+        <button ng-disabled="EditPlayerForm.$invalid"  class="btn btn-primary" type="button" ng-click=" playersUpCtrl.update(player); ok()">OK</button>
         <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
     </div>
 </section>

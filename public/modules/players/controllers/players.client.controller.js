@@ -3,32 +3,72 @@
 var playerApp = angular.module('players');
 
 // Players controller
-playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentication', 'Players', '$modal', '$log', '$filter',
-	function ($scope, $stateParams, Authentication, Players, $modal, $log, $filter) {
+playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentication', 'Players', '$modal', '$log', '$filter', 'TeamService',
+	function ($scope, $stateParams, Authentication, Players, $modal, $log, $filter, TeamService) {
         $scope.authentication = Authentication;
 
         // Find a list of Players
         this.players = Players.query();
-
+        this.teams = {
+            count: 2
+        };
+        
+        this.nTeamsChanged = function () {
+            $log.log('Changed to: '+ this.teams.count);
+        };
+        
         this.deletePlayer = function (selectedPlayer) {
             if (selectedPlayer) {
-                $log.log("Deleting " + selectedPlayer.name);
+                $log.log('Deleting ' + selectedPlayer.name);
                 var index = this.players.indexOf(selectedPlayer);
                 this.players.splice(index, 1);
-                $log.log("Deleting " + index);
-
-                //                this.players = $filter('filter')($scope.players, {
-                //                    id: '!selectedPlayer.id'
-                //                });
+                $log.log('Deleting ' + index);
                 selectedPlayer.$remove();
-                // $scope.$apply();
             } else {
-                $log.log("Deleting 2 " + $scope.player.name);
+                $log.log('Deleting 2 ' + $scope.player.name);
                 this.player.$remove(function () {
                     // doing nothing.
                 });
             }
-        }
+        };
+
+
+        this.openRunModalView = function (size, selectedNTeams, allPlayers) {
+            console.log("selectedNTeams: " + selectedNTeams + " players: " + allPlayers.stringify);
+            TeamService.setPlayers(allPlayers);
+            var modalInstance = $modal.open({
+                animation: $scope.animationsEnabled,
+                templateUrl: 'modules/players/views/create-teams.client.view.html',
+                controller: function ($scope, $modalInstance, nTeams) {
+                    $scope.nTeams = nTeams;
+                    $scope.ok = function () {
+                        $log.log('save & close');
+                        $modalInstance.close();
+                    };
+                    $scope.cancel = function () {
+                        $log.log('cancel');
+                        $modalInstance.dismiss('cancel');
+                    };
+
+                },
+                size: size,
+                resolve: {
+                    nTeams: function () {
+                        return selectedNTeams;
+                    },
+                    players: function () {
+                        return allPlayers;
+                    }
+                }
+
+            });
+
+            modalInstance.result.then(function (selectedItem) {
+                $scope.selected = selectedItem;
+            }, function () {
+                $log.info('Modal dismissed at: ' + new Date());
+            });
+        };
 
         this.openAddModalView = function (size) {
             //            $log.info("Creating new player");
@@ -37,16 +77,16 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
                 templateUrl: 'modules/players/views/create-player.client.view.html',
                 controller: function ($scope, $modalInstance) {
                     $scope.ok = function () {
-                        $log.log("save & close");
+                        $log.log('save & close');
                         $modalInstance.close();
                     };
                     $scope.cancel = function () {
-                        $log.log("cancel");
+                        $log.log('cancel');
                         $modalInstance.dismiss('cancel');
                     };
 
                 },
-                size: size,
+                size: size
             });
 
             modalInstance.result.then(function (selectedItem) {
@@ -57,20 +97,18 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
         };
 
         // open a modal window to update a player
-        this.openModalView = function (size, selectedPlayer) {
-            $log.info("Opening " + selectedPlayer.name);
-
+        this.openEditModalView = function (size, selectedPlayer) {
             var modalInstance = $modal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'modules/players/views/edit-player.client.view.html',
                 controller: function ($scope, $modalInstance, player) {
                     $scope.player = player;
                     $scope.ok = function () {
-                        $log.log("update & close");
+                        $log.log('update & close');
                         $modalInstance.close($scope.player);
                     };
                     $scope.cancel = function () {
-                        $log.log("cancel");
+                        $log.log('cancel');
                         $modalInstance.dismiss('cancel');
                     };
 
@@ -97,13 +135,13 @@ playerApp.controller('PlayersUpdateController', ['$scope', 'Players', 'Notify',
         // Update existing Player
         this.update = function (updatedPlayer) {
             var player = updatedPlayer;
-            console.warn("Update!");
-
             player.$update(function () {
                 //    $location.path('players/' + player._id);
             }, function (errorResponse) {
-                console.warn("Update not ok!");
-                Notify.sendMsg('ReloadPlayers', { 'id': errorResponse._id });
+                console.warn('Update not ok!');
+                Notify.sendMsg('ReloadPlayers', {
+                    'id': errorResponse._id
+                });
                 $scope.error = errorResponse.data.message;
             });
         };
@@ -112,40 +150,43 @@ playerApp.controller('PlayersUpdateController', ['$scope', 'Players', 'Notify',
 playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify',
 	function ($scope, Players, Notify) {
         this.player = new Players({
-            name: "",
-            rank: ""
+            name: '',
+            rank: ''
         });
 
 
 
         this.create = function () {
-            console.warn("creating " + this.player.name + " " + this.player.rank);
-
             this.player.$save(function (response) {
-                console.log("Save ok ");
-                Notify.sendMsg('ReloadPlayers', { 'id': response._id });
+                Notify.sendMsg('ReloadPlayers', {
+                    'id': response._id
+                });
             }, function (errorResponse) {
-                console.warn("Update not ok!");
+                console.warn('Update not ok!');
                 $scope.error = errorResponse.data.message;
             });
         };
-     }
-]);
+    }]);
 
-playerApp.directive('playersList', ['Players', 'Notify', function(Players, Notify) {
+playerApp.directive('playersList', ['Players', 'Notify', function (Players, Notify) {
     return {
         restrict: 'E',
         transclude: true,
         templateUrl: 'modules/players/views/players-list-template.html',
-        link: function(scope, element, attrs) {
-            Notify.getMsg('ReloadPlayers', function(event,data) {
+        link: function (scope, element, attrs) {
+            Notify.getMsg('ReloadPlayers', function (event, data) {
                 scope.playersCtrl.players = Players.query();
             });
         }
-    }}] );
-//
-//playerApp.controller('PlayersController3', ['$scope', '$stateParams', '$location', 'Authentication', 'Players',
-//	function ($scope, $stateParams, $location, Authentication, Players) {
+    };
+}]);
+
+
+playerApp.controller('CreateTeamsController', ['$scope', 'Players', 'Notify', 'TeamService',
+	function ($scope, Players, Notify, TeamService) {
+        this.players = TeamService.getPlayers();
+    }
+                                            ]);
 //
 //        // Create new Player
 //        $scope.create = function () {

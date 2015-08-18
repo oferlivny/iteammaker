@@ -21,7 +21,7 @@
     </br></br>
     <div class="list-group">
         <div data-ng-repeat="player in playersCtrl.players | filter:searchText"  ng-class="{'list-group-item-success': player.rank>5, 'list-group-item-warning': player.rank<=5, 'list-group-item-danger': player.rank<=3}">
-        <a ng-click="playersCtrl.openModalView('lg',player)" class="list-group-item">
+        <a ng-click="playersCtrl.openEditModalView('lg',player)" class="list-group-item">
             <small class="list-group-item-text">
 				Posted on
 				<span data-ng-bind="player.created | date:'medium'"></span>

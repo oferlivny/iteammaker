@@ -1,14 +1,43 @@
 <section data-ng-controller="PlayersController as playersCtrl">
-    <div class="row" data-ng-controller="PlayersCreateController as playersCreateCtrl">
-        <a ng-click="playersCtrl.openAddModalView('lg')" class="list-group-item">
-            <button type="button" class="btn btn-success">
-                <i class="glyphicon glyphicon-plus"></i> Add Player
-            </button>
-
-        </a>
-
-    </div>
     <div class="row">
-        <players-list></players-list>
+        <br>
+        <div class="col-xs-4">
+            <a ng-click="playersCtrl.openRunModalView('lg', playersCtrl.teams.count, playersCtrl.players)">
+                <button type="button" class="btn btn-danger">
+                    <i class="glyphicon glyphicon-random"></i> Go!
+                </button>
+            </a>
+        </div>
+        <div class="col-xs-2">
+
+        # Teams:
+        </div>
+        <div class="col-xs-4">
+            <select class="form-control col-sm-2" data-ng-model="playersCtrl.teams.count" name="nTeams" ng-change="playersCtrl.nTeamsChanged()">
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+            </select>
+        </div>
+        <br>
+        <br>
+        <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading" data-ng-controller="PlayersCreateController as playersCreateCtrl">
+            </div>
+            <div class="panel-body">
+                <p>
+                    <a ng-click="playersCtrl.openAddModalView('lg')">
+                        <button type="button" class="btn btn-success">
+                            <i class="glyphicon glyphicon-plus"></i> Add Player
+                        </button>
+                    </a>
+
+                </p>
+            </div>
+
+            <players-list></players-list>
+        </div>
     </div>
 </section>

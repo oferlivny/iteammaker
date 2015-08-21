@@ -3,8 +3,8 @@
 var playerApp = angular.module('players');
 
 // Players controller
-playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentication', 'Players', '$modal', '$log', '$filter', 'TeamService',
-	function ($scope, $stateParams, Authentication, Players, $modal, $log, $filter, TeamService) {
+playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentication', 'Players', '$modal', '$log', '$filter', 'TeamService', '$timeout',
+	function ($scope, $stateParams, Authentication, Players, $modal, $log, $filter, TeamService, $timeout) {
         $scope.authentication = Authentication;
 
         // Find a list of Players
@@ -12,11 +12,11 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
         this.teams = {
             count: 2
         };
-        
+
         this.nTeamsChanged = function () {
-            $log.log('Changed to: '+ this.teams.count);
+            $log.log('Changed to: ' + this.teams.count);
         };
-        
+
         this.deletePlayer = function (selectedPlayer) {
             if (selectedPlayer) {
                 $log.log('Deleting ' + selectedPlayer.name);
@@ -35,7 +35,10 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
 
         this.openRunModalView = function (size, selectedNTeams, allPlayers) {
             console.log("# teams: " + selectedNTeams + " # players: " + allPlayers.length);
-            TeamService.setData({'players':allPlayers, 'nTeams': selectedNTeams});
+            TeamService.setData({
+                'players': allPlayers,
+                'nTeams': selectedNTeams
+            });
             var modalInstance = $modal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'modules/players/views/create-teams.client.view.html',
@@ -87,7 +90,11 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
                 },
                 size: size
             });
-
+            modalInstance.opened.then(function () {
+                $timeout(function () {
+                    //angular.element('Name').trigger('focus');
+                });
+            });
             modalInstance.result.then(function (selectedItem) {
                 $scope.selected = selectedItem;
             }, function () {
@@ -146,25 +153,48 @@ playerApp.controller('PlayersUpdateController', ['$scope', 'Players', 'Notify',
         };
     }]);
 
-playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify',
-	function ($scope, Players, Notify) {
-        this.player = new Players({
-            name: '',
-            rank: ''
-        });
+playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 'Focus',
+	function ($scope, Players, Notify, Focus) {
+
+        var player =
+            new Players({
+                name: '',
+                rank: ''
+            });
+        $scope.player = player;
+
+        var defaultErrCallback = function (errorResponse) {
+            console.warn('Update not ok!');
+            $scope.error = errorResponse.data.message;
+        };
+        this.savePlayer = function (doneCallback, errorCallback) {
+            $scope.player.$save(doneCallback, errorCallback);
+        }
 
 
-
-        this.create = function () {
-            this.player.$save(function (response) {
+        this.createAndReload = function () {
+            this.savePlayer(function (response) {
                 Notify.sendMsg('ReloadPlayers', {
                     'id': response._id
                 });
-            }, function (errorResponse) {
-                console.warn('Update not ok!');
-                $scope.error = errorResponse.data.message;
-            });
+            }, defaultErrCallback);
         };
+        this.createAndClear = function () {
+            this.savePlayer(function (response) {
+                player =
+                    new Players({
+                        name: '',
+                        rank: ''
+                    });
+                $scope.player = player;
+                Notify.sendMsg('ReloadPlayers', {
+                    'id': response._id
+                });
+
+                Focus('name');
+            }, defaultErrCallback);
+        };
+
     }]);
 
 playerApp.directive('playersList', ['Players', 'Notify', function (Players, Notify) {
@@ -180,6 +210,28 @@ playerApp.directive('playersList', ['Players', 'Notify', function (Players, Noti
     };
 }]);
 
+playerApp.directive('focusMe', function ($timeout, $parse) {
+    return {
+        //scope: true,   // optionally create a child scope
+        link: function (scope, element, attrs) {
+            var model = $parse(attrs.focusMe);
+            scope.$watch(model, function (value) {
+                console.log('value=', value);
+                if (value === true) {
+                    $timeout(function () {
+                        element[0].focus();
+                    });
+                }
+            });
+            //      // to address @blesh's comment, set attribute value to 'false'
+            //      // on blur event:
+            //      element.bind('blur', function() {
+            //         console.log('blur');
+            //         scope.$apply(model.assign(scope, false));
+            //      });
+        }
+    };
+});
 
 playerApp.controller('CreateTeamsController', ['$scope', 'Players', 'Notify', 'TeamService',
 	function ($scope, Players, Notify, TeamService) {
@@ -187,7 +239,7 @@ playerApp.controller('CreateTeamsController', ['$scope', 'Players', 'Notify', 'T
         this.players = data.players;
         this.nTeams = data.nTeams;
         this.teams = TeamService.createTeams(this.nTeams, this.players);
-        
+
     }
                                             ]);
 //

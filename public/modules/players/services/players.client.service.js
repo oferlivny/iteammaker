@@ -38,6 +38,22 @@ angular.module('players')
         }
     ])
 
+.factory('Focus', function($timeout, $window) {
+    return function(id) {
+      // timeout makes sure that it is invoked after any other event has been triggered.
+      // e.g. click events that need to run before the focus or
+      // inputs elements that are in a disabled state but are enabled when those events
+      // are triggered.
+      $timeout(function() {
+          console.log("Focusing");
+        var element = $window.document.getElementById(id);
+        if(element)
+          element.focus();
+      });
+    };
+  })
+
+
 .service('TeamService', function () {
     var data = [];
 
@@ -240,7 +256,8 @@ angular.module('players')
     return {
         setData: setData,
         getData: getData,
-        createTeams: createTeamsBinCompletion //createTeamsSimple //createTeamsNaive
+        //createTeams: createTeamsBinCompletion
+        createTeams: createTeamsSimple //createTeamsNaive
     };
 
 });;

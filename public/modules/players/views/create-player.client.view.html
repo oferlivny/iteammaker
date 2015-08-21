@@ -3,30 +3,47 @@
         <h3 class="modal-title">Edit Player</h3>
     </div>
     <div class="modal-body">
-    </div>
 
 
 
-    <form name="NewPlayerForm">
-        <fieldset>
-            <div class="row">
-                <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
-                    <label class="control-label" for="rank">Rank</label>
+        <form name="NewPlayerForm">
+            <fieldset>
+                <div class="row" align="center">
+                    <div class="form-group">
+                        <table>
+                            <tr>
+                                <td>
+                                    <label class="control-label" for="name">Name</label>
+                                </td>
+                                <td>
+                                    <input type="text" data-ng-model="player.name" id="name" class="input-mini" placeholder="Name" name="Name" align="center" focus-me="true" required/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="control-label" for="rank">Rank</label>
+                                </td>
+                                <td>
 
-                    <div class="controls">
-                        <input type="text" data-ng-model="playersCreateCtrl.player.name" id="name" class="form-control" placeholder="Name" required>
-                        <input type="text" max="10" min="0" data-ng-model="playersCreateCtrl.player.rank" id="rank" class="form-control" placeholder="Rank" required>
+                                    <input type="number" max="10" min="0" data-ng-model="player.rank" id="rank" class="input-mini" placeholder="Rank" align="center" required/>
+                                </td>
+                                <td>
+                                    <slider ng-model="player.rank.A" min="0" step="0.5" max="10" value="0"></slider>
+                                </td>
+                            </tr>
+                        </table>
+                        <div data-ng-show="error" class="text-danger">
+                            <strong data-ng-bind="error"></strong>
+                        </div>
                     </div>
                 </div>
-                <div data-ng-show="error" class="text-danger">
-                    <strong data-ng-bind="error"></strong>
-                </div>
-            </div>
-        </fieldset>
-    </form>
-    <div class="modal-footer">
-        <button ng-disabled="NewPlayerForm.$invalid" class="btn btn-primary" type="button" ng-click=" playersCreateCtrl.create(); ok()">OK</button>
-        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+            </fieldset>
+        </form>
+        <div class="modal-footer">
+            <button ng-disabled="NewPlayerForm.$invalid" class="btn btn-primary" type="button" ng-click=" playersCreateCtrl.createAndClear();">Add+</button>
+            <button ng-disabled="NewPlayerForm.$invalid" class="btn btn-primary" type="button" ng-click=" playersCreateCtrl.createAndReload(); ok()">Done</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>
     </div>
+
 </section>

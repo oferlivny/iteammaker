@@ -1,25 +1,19 @@
 <!--<div class="list-group">-->
-<div class="list-group-item" ng-repeat="player in playersCtrl.players">
-<!--    <div class="list-group-item">-->
-    <div class="row">
-        <div class="col-xs-2 ">
+
+
+<div class="col-xs-3 col-md-2" ng-repeat="player in playersCtrl.players">
+    <div class="thumbnail">
+        <div class="caption">
+            <div ng-click="playersCtrl.openEditModalView('sm',player);">
+                <button type="button" class="btn btn-default btn-lg">
+                    <i class="glyphicon glyphicon-user" aria-hidden="true"></i> {{player.name}}
+                    <div class="badge">{{player.rank}}</div>
+                </button>
+            </div>
+            <h3>Some title</h3>
+            <p>Some text</p>
             <button type="button" class="btn btn-danger btn-sm" ng-click="playersCtrl.deletePlayer(player);">
-                <i class="glyphicon glyphicon-trash"></i>
-                Delete
-            </button>
-        </div>
-        <div class="col-xs-4  col-xs-offset-1">
-            <div class="row-xs-6">
-                Name: {{player.name}} 
-            </div>
-            <div class="row-xs-6">
-                Rank: {{player.rank}}
-            </div>
-        </div>
-        <div class="col-xs-2">
-            <button type="button" class="btn btn-default btn-sm" ng-click="playersCtrl.openEditModalView('sm',player);">
-                <i class="glyphicon glyphicon-pencil"></i>
-                Edit
+                <i class="glyphicon glyphicon-trash"></i> Delete
             </button>
         </div>
     </div>

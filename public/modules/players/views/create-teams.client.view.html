@@ -5,10 +5,18 @@
     <div class="modal-body">
         
     </div>
-    {{nTeams}}
-    size: {{players.size()}}
-    {{createTeamsCtrl.nTeams}}
-    count: {{createTeamsCtrl.players.size()}}
+    size: {{createTeamsCtrl.nTeams}}
+    count: {{createTeamsCtrl.players.length}}
+    team count: {{createTeamsCtrl.teams.length}}
+    team count0: {{createTeamsCtrl.teams[0].length}}
+    team count1: {{createTeamsCtrl.teams[1].length}}
+    <div class="list-group-item" ng-repeat="team in createTeamsCtrl.teams">
+        {{team.name}}
+        <div class="list-group-item" ng-repeat="player in team.players">
+            {{player.name}} {{player.rank}}
+        </div>
+    </div>
+
     <div class="modal-footer">
         <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
     </div>

@@ -34,13 +34,12 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
 
 
         this.openRunModalView = function (size, selectedNTeams, allPlayers) {
-            console.log("selectedNTeams: " + selectedNTeams + " players: " + allPlayers.stringify);
-            TeamService.setPlayers(allPlayers);
+            console.log("# teams: " + selectedNTeams + " # players: " + allPlayers.length);
+            TeamService.setData({'players':allPlayers, 'nTeams': selectedNTeams});
             var modalInstance = $modal.open({
                 animation: $scope.animationsEnabled,
                 templateUrl: 'modules/players/views/create-teams.client.view.html',
                 controller: function ($scope, $modalInstance, nTeams) {
-                    $scope.nTeams = nTeams;
                     $scope.ok = function () {
                         $log.log('save & close');
                         $modalInstance.close();
@@ -58,7 +57,7 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
                     },
                     players: function () {
                         return allPlayers;
-                    }
+                    },
                 }
 
             });
@@ -184,7 +183,11 @@ playerApp.directive('playersList', ['Players', 'Notify', function (Players, Noti
 
 playerApp.controller('CreateTeamsController', ['$scope', 'Players', 'Notify', 'TeamService',
 	function ($scope, Players, Notify, TeamService) {
-        this.players = TeamService.getPlayers();
+        var data = TeamService.getData();
+        this.players = data.players;
+        this.nTeams = data.nTeams;
+        this.teams = TeamService.createTeams(this.nTeams, this.players);
+        
     }
                                             ]);
 //

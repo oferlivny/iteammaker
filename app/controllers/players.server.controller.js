@@ -73,7 +73,11 @@ exports.delete = function(req, res) {
  * List of Players
  */
 exports.list = function(req, res) { 
-	Player.find().sort('-created').populate('user', 'displayName').exec(function(err, players) {
+    
+    // get only entries created by this user
+    var criteria = {user:req.user};
+    
+	Player.find(criteria).sort('-created').populate('user', 'displayName').exec(function(err, players) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)

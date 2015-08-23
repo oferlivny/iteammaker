@@ -8,7 +8,23 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
         $scope.authentication = Authentication;
 
         // Find a list of Players
-        this.players = Players.query();
+        var resource_players = Players.query( function () {
+            console.log("Got " + resource_players.length);
+            $scope.players = new Array();
+            var p;
+            var x = 0;
+            resource_players.forEach( function(p) {
+                //expect(p instanceof Player).toEqual(true); 
+                var player = {
+                    'player': p,
+                    'team': x
+                };
+                x= 1-x;
+                $scope.players.push(player);
+            });
+            console.log("Created " + $scope.players.length + " entries");
+        });
+        
         this.teams = {
             count: 2
         };
@@ -20,8 +36,8 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
         this.deletePlayer = function (selectedPlayer) {
             if (selectedPlayer) {
                 $log.log('Deleting ' + selectedPlayer.name);
-                var index = this.players.indexOf(selectedPlayer);
-                this.players.splice(index, 1);
+                var index = $scope.players.indexOf(selectedPlayer);
+                $scope.players.splice(index, 1);
                 $log.log('Deleting ' + index);
                 selectedPlayer.$remove();
             } else {
@@ -156,11 +172,13 @@ playerApp.controller('PlayersUpdateController', ['$scope', 'Players', 'Notify',
 playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 'Focus',
 	function ($scope, Players, Notify, Focus) {
 
-        var player =
-            new Players({
+        var player = {
+            player: new Players({
                 name: '',
                 rank: ''
-            });
+            }),
+            team: 0
+        };
         $scope.player = player;
 
         var defaultErrCallback = function (errorResponse) {
@@ -168,7 +186,7 @@ playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 
             $scope.error = errorResponse.data.message;
         };
         this.savePlayer = function (doneCallback, errorCallback) {
-            $scope.player.$save(doneCallback, errorCallback);
+            $scope.player.player.$save(doneCallback, errorCallback);
         }
 
 
@@ -181,11 +199,13 @@ playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 
         };
         this.createAndClear = function () {
             this.savePlayer(function (response) {
-                player =
-                    new Players({
+                var player = {
+                    player: new Players({
                         name: '',
                         rank: ''
-                    });
+                    }),
+                    team: 0
+                };
                 $scope.player = player;
                 Notify.sendMsg('ReloadPlayers', {
                     'id': response._id

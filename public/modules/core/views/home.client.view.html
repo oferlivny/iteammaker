@@ -1,18 +1,30 @@
 <section data-ng-controller="PlayersController as playersCtrl">
     <div class="row">
         <br>
-        <div class="col-xs-4">
-            <a ng-click="playersCtrl.openRunModalView('lg', playersCtrl.teams.count, playersCtrl.players)">
+        <div class="col-xs-2">
+            <a ng-click="playersCtrl.openRunModalView('lg', playersCtrl.teams.count, players)">
                 <button type="button" class="btn btn-danger">
                     <i class="glyphicon glyphicon-random"></i> Go!
                 </button>
             </a>
         </div>
-        <div class="col-xs-2">
+        <div class="col-xs-2 col-xs-offset-1">Teams:</div>
 
-            # Teams:
-        </div>
-        <div class="col-xs-4">
+        <div class="col-xs-4 ">
+<!--
+            <label class="checkbox-inline">
+  <input type="checkbox" id="inlineCheckbox1" value="teams2"> 2 Teams
+</label>
+<label class="checkbox-inline">
+  <input type="checkbox" id="inlineCheckbox2" value="teams3"> 3 Teams
+</label>
+<label class="checkbox-inline">
+  <input type="checkbox" id="inlineCheckbox3" value="teams4"> 4 Teams
+</label>
+<label class="checkbox-inline">
+  <input type="checkbox" id="inlineCheckbox4" value="teams5"> 5 Teams
+</label>
+-->
             <select class="form-control col-sm-2" data-ng-model="playersCtrl.teams.count" name="nTeams" ng-change="playersCtrl.nTeamsChanged()">
                 <option>2</option>
                 <option>3</option>

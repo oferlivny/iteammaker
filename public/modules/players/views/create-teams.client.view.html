@@ -13,7 +13,7 @@
     <div class="list-group-item" ng-repeat="team in createTeamsCtrl.teams">
         {{team.name}}
         <div class="list-group-item" ng-repeat="player in team.players">
-            {{player.name}} {{player.rank}}
+            {{player.player.name}} {{player.player.rank}}
         </div>
     </div>
 

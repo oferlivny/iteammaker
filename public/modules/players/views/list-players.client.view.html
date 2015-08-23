@@ -7,7 +7,7 @@
             <input type="text" ng-model="searchText" class="form-control" placeholder="Search for...">
         </row>
         <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Go!test321</button>
+                <button class="btn btn-default" type="button">Go!</button>
             </span>
     </div>
     <div class="row">
@@ -23,7 +23,7 @@
     </br>
     </br>
     <div class="list-group">
-        <div data-ng-repeat="player in playersCtrl.players | filter:searchText" ng-class="{'list-group-item-success': player.rank>5, 'list-group-item-warning': player.rank<=5, 'list-group-item-danger': player.rank<=3}">
+        <div data-ng-repeat="player in players | filter:searchText" ng-class="{'list-group-item-success': player.rank>5, 'list-group-item-warning': player.rank<=5, 'list-group-item-danger': player.rank<=3}">
             <a ng-click="playersCtrl.openEditModalView('lg',player)" class="list-group-item">
                 <small class="list-group-item-text">
 				Posted on

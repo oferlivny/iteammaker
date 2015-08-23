@@ -6,16 +6,23 @@
         <input type="text" ng-model="searchText" class="form-control" placeholder="Filter players...">
     </div>
 </div>
-<div class="col-xs-6 col-sm-4 col-md-2" ng-repeat="player in playersCtrl.players | filter:searchText">
+<div class="col-xs-6 col-sm-4 col-md-2" ng-repeat="player in players | filter:searchText">
     <div class="thumbnail">
-        <div class="caption">
+
+        <div class="caption" ng-class="{'bg-primary':player.team==0}">
+            
+<!--
+            :player.player.team === 0, 'bg-info':
+                  player.player.team === 1}">
+-->
             <div ng-click="playersCtrl.openEditModalView('sm',player);">
                 <button type="button" class="btn btn-default btn-lg">
-                    <i class="glyphicon glyphicon-user" aria-hidden="true"></i> {{player.name}}
+                    <i class="glyphicon glyphicon-user" aria-hidden="true"></i> {{player.player.name}}
                     <div class="badge">{{player.rank}}</div>
                 </button>
             </div>
-            <h3>Some title</h3>
+            
+            <h3 class="ofertest">Some title</h3>
             <p>Some text</p>
             <button type="button" class="btn btn-danger btn-sm" ng-click="playersCtrl.deletePlayer(player);">
                 <i class="glyphicon glyphicon-trash"></i> Delete

@@ -109,11 +109,11 @@ angular.module('players')
         }
         console.log('Got ' + players.length + ' players for ' + nTeams + ' teams');
         players.sort(function (a, b) {
-            return a.rank - b.rank;
+            return a.player.rank - b.player.rank;
         });
         for (var i = 0; i < players.length; i++) {
             teams[teamidx].players.push(players[i]);
-            console.log('Player ' + players[i].name + ' to team ' + teamidx);
+            console.log('Player ' + players[i].player.name + ' to team ' + teamidx);
             teamidx = teamidx + direction;
             if (teamidx == nTeams) {
                 teamidx--;
@@ -156,7 +156,7 @@ angular.module('players')
                     // add to current team
                     {
                         players: current.players.concat(player),
-                        rankTotal: current.rankTotal + player.rank
+                        rankTotal: current.rankTotal + player.player.rank
                     },
                     // final team container
                     allTeams,

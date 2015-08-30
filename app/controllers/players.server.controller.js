@@ -110,6 +110,21 @@ var userCanGenTeams = function (user) {
     return true;
 };
 
+function union_arrays(x, y) {
+    var obj = {};
+    for (var i = x.length - 1; i >= 0; --i)
+        obj[x[i]] = x[i];
+    for (var i = y.length - 1; i >= 0; --i)
+        obj[y[i]] = y[i];
+    var res = []
+    for (var k in obj) {
+        if (obj.hasOwnProperty(k)) // <-- optional
+            res.push(obj[k]);
+    }
+    return res;
+}
+
+
 var genTeams = function (players, nTeams) {
     //    console.log('Generating ' + nTeams + ' teams');    
     var team = 0;
@@ -150,21 +165,30 @@ var standardDeviation = function (values) {
 
 var rankTeams = function (teams) {
     var s = 0;
-    for (var team in teams) {
-        var ranks = team.map(function (p) {return p.rank;});
-        var std=standardDeviation(ranks);
-        console.log('stdev: ' + std);
-        s += std;
-    }
-    return s;
+    var teamRanks = teams.map(function (team) {
+        return team.reduce(function (prev, player) {
+                return prev + player.rank;
+            },
+            0);
+    });
+    var std = standardDeviation(teamRanks);
+    return 100.0 - standardDeviation(teamRanks);
 };
 
-var restOfTeamsAreReasonable = function ( players, team) {
-    return true;
+var restOfTeamsAreReasonable = function (players, exclude, playersPerTeam) {
+    var playersFiltered = players.filter(function (el) {
+        return exclude.indexOf(el) < 0;
+    });
+
+    if (playersFiltered.length >= playersPerTeam)
+        return true;
+    else
+        return false;
+
 };
 
-var combine = function(a, min) {
-    var fn = function(n, src, got, all) {
+var combine = function (a, min) {
+    var fn = function (n, src, got, all) {
         if (Number(n) === 0) {
             if (got.length > 0) {
                 all[all.length] = got;
@@ -184,27 +208,80 @@ var combine = function(a, min) {
     return all;
 };
 
-var allTeams = function (players, playersPerTeam) {
-    return combine(players, playersPerTeam);
+var allTeams = function (players, teams, playersPerTeam) {
+    var playersFiltered = players.filter(function (el) {
+        var found = 0;
+        teams.forEach(function (team) {
+            found = found + (team.indexOf(el) >= 0)
+            
+            if (found > 0) {
+                console.log(el.name + ' exists');
+            };
+        });
+        return found == 0;
+    });
+    var assert = require('assert');
+    assert.ok(playersFiltered.length > 0);
+    
+    console.log('playersFiltered length: ' + playersFiltered.length);
+    return combine(playersFiltered, playersPerTeam);
 };
 
-var genTeams2 = function (players, exclude, playersPerTeam) {
-    console.log('Expecting ' + playersPerTeam + ' per team');
-    var bestTeams = [];
-    var bestRank = 0;
-    for (var team in allTeams(players, exclude, playersPerTeam)) {
-        if (restOfTeamsAreReasonable(players, team)) {
-            var teams = genTeams2(players, exclude.append(team), playersPerTeam);
-            if (exclude.length === 0) {
-                var rank = rankTeams(teams);
-                if (rank > bestRank) {
-                    bestTeams = teams;
-                    bestRank = rank;
-                }
-            }
+function canGenerateMoreTeams(players, teams) {
+    var total = 0;
+    teams.forEach(function (team) {
+        total = total + team.length;
+    });
+    if (players.length > total) return true;
+}
+
+// if got players for new teams, generate all possibilities and recurse.
+// otherwise, update bestTeams and return;
+var genTeams2 = function (players, teams, playersPerTeam, bestTeams) {
+    var deadlockBreaker = 100000;
+    //    console.log('Starting. Already got # teams: ' + teams.length);
+
+    // stop condition
+    if (!canGenerateMoreTeams(players, teams)) {
+        //        console.log('Stop condition!');
+        var rank = rankTeams(teams);
+        if (rank > bestTeams.rank) {
+            console.log('New best - ' + rank);
+            bestTeams.teams = teams;
+            bestTeams.rank = rank;
+            teams.forEach(function (team) {
+                console.log('Team:');
+                team.forEach(function (player) {
+                    console.log(' ' + player.name);
+                });
+            });
+
         }
+        return;
     }
-    return bestTeams;
+
+    var availableTeams = allTeams(players, teams, playersPerTeam);
+    //    console.log('Got ' + availableTeams.length + ' teams');
+
+    for (var team in availableTeams) {
+        deadlockBreaker = deadlockBreaker - 1;
+        if (deadlockBreaker == 0) {
+            console.log('DeadLock Breaker!');
+            break;
+        }
+        //        console.log('Team size: ' + availableTeams[team].length);
+        // optimization
+        if (!restOfTeamsAreReasonable(players, teams.concat([availableTeams[team]]), playersPerTeam)) {
+            console.log('optimizing!');
+            return;
+        };
+        // recurse
+        //        console.log('recursing!');
+        genTeams2(players, teams.concat([availableTeams[team]]), playersPerTeam, bestTeams);
+
+
+    };
+    return;
 };
 
 
@@ -242,8 +319,22 @@ exports.list = function (req, res) {
         } else {
             if (userCanGenTeams(req.user)) {
                 userGenereatesTeams(req.user);
-                genTeams(players, req.query.nTeams);
-                //genTeams2(players, players.length / req.query.nTeams);
+                //genTeams(players, req.query.nTeams);
+                var playersPerTeam = Math.ceil(players.length / req.query.nTeams);
+                var bestTeams = {
+                    'rank': 0,
+                    'teams': []
+                };
+                genTeams2(players, [], playersPerTeam, bestTeams);
+                var teamidx = 0;
+                bestTeams.teams.forEach(function (team) {
+                    team.forEach(function (player) {
+                        player.team = teamidx;
+                    });
+                    teamidx = teamidx + 1;
+                });
+                console.log('# teams: ' + bestTeams.teams.length);
+                console.log('Rank: ' + bestTeams.rank);
             } else {
                 resetTeams(players);
             }

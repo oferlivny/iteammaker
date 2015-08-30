@@ -33,7 +33,7 @@ angular.module('players')
             if (scope) {
                 scope.$on('destroy', unbind);
             }
-        }
+        };
         return notify;
         }
     ])
@@ -45,7 +45,7 @@ angular.module('players')
       // inputs elements that are in a disabled state but are enabled when those events
       // are triggered.
       $timeout(function() {
-          console.log("Focusing");
+//          console.log("Focusing");
         var element = $window.document.getElementById(id);
         if(element)
           element.focus();
@@ -72,21 +72,22 @@ angular.module('players')
         var teams = new Array(nTeams);
         // running team index
         var teamidx = 0;
-
-        for (var i = 0; i < nTeams; i++) {
+        var i = 0;
+        
+        for (i = 0; i < nTeams; i++) {
             teams[i] = {
-                'players': new Array(),
+                'players': [],
                 'name': i
             };
         }
-        console.log('Got ' + players.length + ' players for ' + nTeams + ' teams');
-        for (var i = 0; i < players.length; i++) {
+//        console.log('Got ' + players.length + ' players for ' + nTeams + ' teams');
+        for (i = 0; i < players.length; i++) {
             teams[teamidx].players.push(players[i]);
-            console.log('Player ' + players[i].name + ' to team ' + teamidx);
+//            console.log('Player ' + players[i].name + ' to team ' + teamidx);
             teamidx++;
-            if (teamidx == nTeams) {
+            if (teamidx === nTeams) {
                 teamidx = 0;
-            };
+            }
         }
 
         return teams;
@@ -100,29 +101,33 @@ angular.module('players')
         var teamidx = 0;
         // choose direction ( 1 up, -1 down )
         var direction = 1;
-
-        for (var i = 0; i < nTeams; i++) {
+        
+        var i = 0;
+        
+        for (i = 0; i < nTeams; i++) {
             teams[i] = {
-                'players': new Array(),
+                'players': [],
                 'name': i
             };
         }
-        console.log('Got ' + players.length + ' players for ' + nTeams + ' teams');
+//        console.log('Got ' + players.length + ' players for ' + nTeams + ' teams');
         players.sort(function (a, b) {
-            return a.player.rank - b.player.rank;
+            return a.rank - b.rank;
         });
-        for (var i = 0; i < players.length; i++) {
+        for (i = 0; i < players.length; i++) {
+            console.log('Player ' + players[i].name + ' out of ' + players[i].length + ' to team ' + teamidx + ' out of ' + teams.length + ' ' + nTeams);
             teams[teamidx].players.push(players[i]);
-            console.log('Player ' + players[i].player.name + ' to team ' + teamidx);
             teamidx = teamidx + direction;
             if (teamidx == nTeams) {
                 teamidx--;
                 direction = -1;
-            };
-            if (teamidx == -1) {
+            }
+            if (teamidx === -1) {
                 teamidx++;
                 direction = 1;
-            };
+            }
+            console.log('next team' + teamidx + ' direction ' + direction);
+
         }
 
         return teams;
@@ -138,7 +143,7 @@ angular.module('players')
             //                        ' playersPerTeam = ' + playersPerTeam +
             //                        ' current size = ' + current.length +
             //                        ' # teams = ' + allTeams.length );
-            if (current.players.length == config.playersPerTeam) {
+            if (current.players.length === config.playersPerTeam) {
                 if (current.rankTotal > config.low && current.rankTotal < config.high) {
                     allTeams.push(current.players);
                 }
@@ -173,13 +178,13 @@ angular.module('players')
         return allTeams;
     };
     var genTeams = function (config, currentTeams, bestTeams) {
-        if (config.players.length == 0) {
+        if (config.players.length === 0) {
             if (bestTeams.totalRank < currentTeams.totalRank) {
                 console.log('Found better with rank ' + currentTeams.totalRank);
                 bestTeams = currentTeams;
-            };
+            }
             return;
-        };
+        }
         var allRelevantTeams = getTeamsWithRankRange(config);
         //        for (var i = 0; i < allRelevantTeams.length; i++) {
         //                genTeams(
@@ -188,8 +193,8 @@ angular.module('players')
         //                    // new data
         //                    {currentTeams.teams.concat(allRelevantTeams[i]),
         //            remaining = myArray.filter( function( el ) {
-        return toRemove.indexOf(el) < 0;
-    }
+        return; // toRemove.indexOf(el) < 0;
+    };
 
 
 
@@ -203,9 +208,10 @@ angular.module('players')
         // choose direction ( 1 up, -1 down )
         var direction = 1;
 
-        for (var i = 0; i < nTeams; i++) {
+        var i = 0;
+        for (i = 0; i < nTeams; i++) {
             teams[i] = {
-                'players': new Array(),
+                'players': [],
                 'name': i
             };
         }
@@ -218,7 +224,7 @@ angular.module('players')
                 return o.rank;
             }).reduce(function (a, b) {
                 return a + b;
-            })
+            });
             // optimal team rank
         var rankTeamOptim = rankSum / nTeams;
         var lowHighRatio = 0.3;
@@ -237,22 +243,23 @@ angular.module('players')
         };
 
         var finalTeams = genTeams(config);
-        for (var i = 0; i < players.length; i++) {
+        for (i = 0; i < players.length; i++) {
             teams[teamidx].players.push(players[i]);
             console.log('Player ' + players[i].name + ' to team ' + teamidx);
             teamidx = teamidx + direction;
-            if (teamidx == nTeams) {
+            if (teamidx === nTeams) {
                 teamidx--;
                 direction = -1;
-            };
-            if (teamidx == -1) {
+            }
+            if (teamidx === -1) {
                 teamidx++;
                 direction = 1;
-            };
+            }
         }
 
         return teams;
     };
+    
     return {
         setData: setData,
         getData: getData,
@@ -260,4 +267,4 @@ angular.module('players')
         createTeams: createTeamsSimple //createTeamsNaive
     };
 
-});;
+});

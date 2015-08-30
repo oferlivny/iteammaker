@@ -1,37 +1,77 @@
 'use strict';
 
 var playerApp = angular.module('players');
+var ArrNoDupe = function (a) {
+    var temp = {};
+    for (var i = 0; i < a.length; i++)
+        temp[a[i]] = true;
+    var r = [];
+    for (var k in temp)
+        r.push(k);
+    return r;
+};
 
 // Players controller
 playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentication', 'Players', '$modal', '$log', '$filter', 'TeamService', '$timeout',
 	function ($scope, $stateParams, Authentication, Players, $modal, $log, $filter, TeamService, $timeout) {
         $scope.authentication = Authentication;
 
-        // Find a list of Players
-        var resource_players = Players.query( function () {
-            console.log("Got " + resource_players.length);
-            $scope.players = new Array();
-            var p;
-            var x = 0;
-            resource_players.forEach( function(p) {
-                //expect(p instanceof Player).toEqual(true); 
-                var player = {
-                    'player': p,
-                    'team': x
-                };
-                x= 1-x;
-                $scope.players.push(player);
+
+        this.updateTeams = function () {
+            $log.log('Changed to: ' + this.teams.count);
+            // Find a list of Players
+            $scope.players = Players.query({
+                'nTeams': this.teams.count
+            }, function () {
+                $scope.allteams = [];
+                $scope.players.forEach(function (p) {
+                    //                    console.log("player : " + p);
+                    $scope.allteams.push(p.team);
+                });
+                $scope.teamsIndexArray = ArrNoDupe($scope.allteams);
+                //                console.log($scope.allteams);
+                //                console.log($scope.teamsIndexArray);
             });
-            console.log("Created " + $scope.players.length + " entries");
-        });
-        
+
+        };
+
+
         this.teams = {
             count: 2
         };
 
-        this.nTeamsChanged = function () {
-            $log.log('Changed to: ' + this.teams.count);
-        };
+        this.updateTeams();
+
+        // Find a list of Players
+        //        console.log('nTeams = ' + this.teams.count);
+        //        $scope.players = Players.query(, function () {
+        //            $scope.allteams = [];
+        //            $scope.players.forEach(function (p) {
+        //                console.log("player : " + p.name + ' : ' + p.team);
+        //                $scope.allteams.push(p.team);
+        //            });
+        //            $scope.teamsIndexArray = ArrNoDupe($scope.allteams);
+        //            console.log($scope.allteams);
+        //            console.log($scope.teamsIndexArray);
+        //        });
+
+        //        function () {
+        ////            console.log("Got " + resource_players.length);
+        //            $scope.players = [];
+        //            var p;
+        //            var x = 0;
+        //            resource_players.forEach( function(p) {
+        //                //expect(p instanceof Player).toEqual(true); 
+        //                var player = {
+        //                    'player': p,
+        //                    'team': x
+        //                };
+        //                x= 1-x;
+        //                $scope.players.push(player);
+        //            });
+        console.log('Created ' + $scope.players.length + ' entries');
+        //});
+
 
         this.deletePlayer = function (selectedPlayer) {
             if (selectedPlayer) {
@@ -50,7 +90,7 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
 
 
         this.openRunModalView = function (size, selectedNTeams, allPlayers) {
-            console.log("# teams: " + selectedNTeams + " # players: " + allPlayers.length);
+            console.log('# teams: ' + selectedNTeams + ' # players: ' + allPlayers.length);
             TeamService.setData({
                 'players': allPlayers,
                 'nTeams': selectedNTeams
@@ -149,7 +189,7 @@ playerApp.controller('PlayersController', ['$scope', '$stateParams', 'Authentica
                 $log.info('Modal dismissed at: ' + new Date());
             });
         };
-    }]);
+                }]);
 
 
 playerApp.controller('PlayersUpdateController', ['$scope', 'Players', 'Notify',
@@ -187,7 +227,7 @@ playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 
         };
         this.savePlayer = function (doneCallback, errorCallback) {
             $scope.player.player.$save(doneCallback, errorCallback);
-        }
+        };
 
 
         this.createAndReload = function () {
@@ -211,7 +251,7 @@ playerApp.controller('PlayersCreateController', ['$scope', 'Players', 'Notify', 
                     'id': response._id
                 });
 
-                Focus('name');
+                //Focus('name');
             }, defaultErrCallback);
         };
 

@@ -30,7 +30,15 @@ var PlayerSchema = new Schema({
 	user: {
 		type: Schema.ObjectId,
 		ref: 'User'
-	}
+	},
+    team: {
+        type: Number,
+        default: 0
+    },
+    inUse: {
+        type: Boolean,
+        default: true
+    }
 });
 
 mongoose.model('Player', PlayerSchema);

@@ -2,7 +2,7 @@
     <div class="row">
         <br>
         <div class="col-xs-2">
-            <a ng-click="playersCtrl.openRunModalView('lg', playersCtrl.teams.count, players)">
+            <a ng-click="playersCtrl.updateTeams()">
                 <button type="button" class="btn btn-danger">
                     <i class="glyphicon glyphicon-random"></i> Go!
                 </button>
@@ -25,7 +25,7 @@
   <input type="checkbox" id="inlineCheckbox4" value="teams5"> 5 Teams
 </label>
 -->
-            <select class="form-control col-sm-2" data-ng-model="playersCtrl.teams.count" name="nTeams" ng-change="playersCtrl.nTeamsChanged()">
+            <select class="form-control col-sm-2" data-ng-model="playersCtrl.teams.count" name="nTeams" ng-change="playersCtrl.updateTeams()">
                 <option>2</option>
                 <option>3</option>
                 <option>4</option>

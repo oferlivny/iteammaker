@@ -88,7 +88,15 @@ var UserSchema = new Schema({
 	},
 	resetPasswordExpires: {
 		type: Date
-	}
+	},
+    allowedTeamsPerHour: {
+        type: Number,
+        default: 5
+    },
+    lastTeams: {
+        type: [Date],
+        default: []
+    }
 });
 
 /**

@@ -151,8 +151,8 @@ var standardDeviation = function (values) {
 var rankTeams = function (teams) {
     var s = 0;
     for (var team in teams) {
-        ranks = team.map(function (p) {return p.rank;});
-        std=standardDeviation(ranks);
+        var ranks = team.map(function (p) {return p.rank;});
+        var std=standardDeviation(ranks);
         console.log('stdev: ' + std);
         s += std;
     }
@@ -194,8 +194,8 @@ var genTeams2 = function (players, exclude, playersPerTeam) {
     var bestRank = 0;
     for (var team in allTeams(players, exclude, playersPerTeam)) {
         if (restOfTeamsAreReasonable(players, team)) {
-            teams = genTeams2(players, exclude.append(team), playersPerTeam);
-            if (exclude.length == 0) {
+            var teams = genTeams2(players, exclude.append(team), playersPerTeam);
+            if (exclude.length === 0) {
                 var rank = rankTeams(teams);
                 if (rank > bestRank) {
                     bestTeams = teams;
@@ -232,7 +232,7 @@ exports.list = function (req, res) {
     if (req.query.nTeams < 2 || req.query.nTeams > 5) {
         console.error('Wrong number of teams : ' + req.query.nTeams);
         return;
-    };
+    }
 
     Player.find(criteria).sort('-created').populate('user', 'displayName').exec(function (err, players) {
         if (err) {
@@ -242,7 +242,8 @@ exports.list = function (req, res) {
         } else {
             if (userCanGenTeams(req.user)) {
                 userGenereatesTeams(req.user);
-                genTeams2(players, req.query.nTeams);
+                genTeams(players, req.query.nTeams);
+                //genTeams2(players, players.length / req.query.nTeams);
             } else {
                 resetTeams(players);
             }
